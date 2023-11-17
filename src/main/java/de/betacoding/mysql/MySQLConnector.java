@@ -32,6 +32,17 @@ public class MySQLConnector implements AutoCloseable {
         return this.connectionInfo;
     }
 
+    public void setDatabase(@NotNull String databaseName) {
+        this.connectionInfo.setDatabaseName(databaseName);
+        if (this.isEstablished()) {
+            try {
+                this.connection.setCatalog(databaseName);
+            } catch (SQLException exception) {
+                this.logger.severe("Failed to set database to '" + databaseName + "'", exception);
+            }
+        }
+    }
+
     public @NotNull Optional<MySQLQueryService> getService() {
         return Optional.ofNullable(this.service);
     }
@@ -44,12 +55,12 @@ public class MySQLConnector implements AutoCloseable {
             return;
         }
 
-        final String address = this.connectionInfo.address().getHostName() + ":" + this.connectionInfo.address().getPort();
+        final String address = this.connectionInfo.getHost() + ":" + this.connectionInfo.getPort();
 
         this.logger.info("Establishing connection to '" + address + "'");
         long millis = System.currentTimeMillis();
         try {
-            this.connection = DriverManager.getConnection(this.connectionInfo.getConnectionURL(), this.connectionInfo.user(), password);
+            this.connection = DriverManager.getConnection(this.connectionInfo.getConnectionURL(), this.connectionInfo.getUser(), password);
             this.service = new MySQLQueryService(this.connection);
         } catch (SQLException exception) {
             this.connection = null;
@@ -66,7 +77,7 @@ public class MySQLConnector implements AutoCloseable {
             return;
         }
 
-        final String address = this.connectionInfo.address().getHostName() + ":" + this.connectionInfo.address().getPort();
+        final String address = this.connectionInfo.getHost() + ":" + this.connectionInfo.getPort();
 
         this.logger.info("Closing connection to '" + address + "'");
         long millis = System.currentTimeMillis();

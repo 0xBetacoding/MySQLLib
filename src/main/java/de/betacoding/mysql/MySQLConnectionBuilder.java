@@ -12,7 +12,8 @@ import java.util.logging.Logger;
 
 public class MySQLConnectionBuilder {
     private final String protocol;
-    private final InetSocketAddress address;
+    private final String host;
+    private final int port;
     private final String databaseName;
     private final String user;
     private final Map<MySQLConnectionProperty<?>, Object> properties = new HashMap<>();
@@ -20,11 +21,29 @@ public class MySQLConnectionBuilder {
     private boolean systemLogger;
     private Logger logger;
 
-    public MySQLConnectionBuilder(@NotNull String protocol, @NotNull InetSocketAddress address, @NotNull String databaseName, @NotNull String user) {
+    public MySQLConnectionBuilder(@NotNull String protocol, @NotNull String host, int port, @NotNull String databaseName, @NotNull String user) {
         this.protocol = protocol;
-        this.address = address;
+        this.host = host;
+        this.port = port;
         this.databaseName = databaseName;
         this.user = user;
+    }
+    public MySQLConnectionBuilder(@NotNull String protocol, @NotNull String host, int port, @NotNull String user) {
+        this(protocol, host, port, "", user);
+    }
+    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull String host, int port, @NotNull String databaseName, @NotNull String user) {
+        this(protocol.toString(), host, port, databaseName, user);
+    }
+    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull String host, int port, @NotNull String user) {
+        this(protocol, host, port, "", user);
+    }
+    @Deprecated
+    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull InetSocketAddress address, @NotNull String databaseName, @NotNull String user) {
+        this(protocol.toString(), address.getHostName(), address.getPort(), databaseName, user);
+    }
+    @Deprecated
+    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull InetSocketAddress address, @NotNull String user) {
+        this(protocol, address.getHostName(), address.getPort(), "", user);
     }
 
     public @NotNull <T> MySQLConnectionBuilder setProperty(@NotNull MySQLConnectionProperty<T> property, @Nullable T value) {
@@ -49,11 +68,11 @@ public class MySQLConnectionBuilder {
 
     public @NotNull MySQLConnector build() {
         Preconditions.checkNotNull(this.protocol);
-        Preconditions.checkNotNull(this.address);
+        Preconditions.checkNotNull(this.host);
         Preconditions.checkNotNull(this.databaseName);
         Preconditions.checkNotNull(this.user);
         Preconditions.checkState(this.logger != null || this.systemLogger, "Logger is not set!");
 
-        return new MySQLConnector(new MySQLConnectionInfo(this.protocol, this.address, this.databaseName, this.user, Collections.unmodifiableMap(this.properties)), this.systemLogger ? new MySQLLogger() : new MySQLLogger(this.logger));
+        return new MySQLConnector(new MySQLConnectionInfo(this.protocol, this.host, this.port, this.databaseName, this.user, Collections.unmodifiableMap(this.properties)), this.systemLogger ? new MySQLLogger() : new MySQLLogger(this.logger));
     }
 }

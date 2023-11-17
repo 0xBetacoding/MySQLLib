@@ -20,6 +20,11 @@ public class MySQLRepository {
         return this.connector.getService().orElseThrow(() -> new RuntimeException("MySQLService is not initiated: Connection is not established"));
     }
 
+    public void setDatabase(@NotNull String databaseName) {
+        if (!this.isEstablished()) throw new RuntimeException("Couldn't set reference database: Connection is not established");
+        this.connector.setDatabase(databaseName);
+    }
+
     public @NotNull CompletableFuture<Void> establish(final @NotNull String password) {
         return this.future = this.future.thenCompose($ -> {
             if (this.connector.isEstablished()) return CompletableFuture.completedFuture(null);
