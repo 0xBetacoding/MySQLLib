@@ -38,12 +38,8 @@ public class MySQLConnectionBuilder {
         this(protocol, host, port, "", user);
     }
     @Deprecated
-    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull InetSocketAddress address, @NotNull String databaseName, @NotNull String user) {
-        this(protocol.toString(), address.getHostName(), address.getPort(), databaseName, user);
-    }
-    @Deprecated
-    public MySQLConnectionBuilder(@NotNull MySQLURLProtocol protocol, @NotNull InetSocketAddress address, @NotNull String user) {
-        this(protocol, address.getHostName(), address.getPort(), "", user);
+    public MySQLConnectionBuilder(@NotNull String protocol, @NotNull InetSocketAddress address, @NotNull String databaseName, @NotNull String user) {
+        this(protocol, address.getHostName(), address.getPort(), databaseName, user);
     }
 
     public @NotNull <T> MySQLConnectionBuilder setProperty(@NotNull MySQLConnectionProperty<T> property, @Nullable T value) {
