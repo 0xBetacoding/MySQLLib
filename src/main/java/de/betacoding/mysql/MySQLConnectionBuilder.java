@@ -1,7 +1,7 @@
 package de.betacoding.mysql;
 
 import com.google.common.base.Preconditions;
-import de.betacoding.logger.Logger;
+import de.betacoding.util.DebugLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class MySQLConnectionBuilder {
     private final String user;
     private final Map<MySQLConnectionProperty<?>, Object> properties = new HashMap<>();
 
-    private Logger logger;
+    private DebugLogger logger;
 
     public MySQLConnectionBuilder(@NotNull String protocol, @NotNull String host, int port, @NotNull String databaseName, @NotNull String user) {
         this.protocol = protocol;
@@ -26,6 +26,7 @@ public class MySQLConnectionBuilder {
         this.port = port;
         this.databaseName = databaseName;
         this.user = user;
+        this.logger = DebugLogger.SYS_LOGGER;
     }
     public MySQLConnectionBuilder(@NotNull String protocol, @NotNull String host, int port, @NotNull String user) {
         this(protocol, host, port, "", user);
@@ -50,7 +51,7 @@ public class MySQLConnectionBuilder {
         return this;
     }
 
-    public @NotNull MySQLConnectionBuilder setLogger(@Nullable Logger logger) {
+    public @NotNull MySQLConnectionBuilder setLogger(@NotNull DebugLogger logger) {
         this.logger = logger;
         return this;
     }

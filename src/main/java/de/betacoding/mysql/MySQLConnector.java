@@ -1,7 +1,7 @@
 package de.betacoding.mysql;
 
 import com.google.common.base.Preconditions;
-import de.betacoding.logger.Logger;
+import de.betacoding.util.DebugLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public class MySQLConnector implements AutoCloseable {
     private final MySQLConnectionInfo connectionInfo;
-    private final Logger logger;
+    private final DebugLogger logger;
 
     private Connection connection;
     private MySQLQueryService service;
 
-    protected MySQLConnector(@NotNull MySQLConnectionInfo connectionInfo, @NotNull Logger logger) {
+    protected MySQLConnector(@NotNull MySQLConnectionInfo connectionInfo, @NotNull DebugLogger logger) {
         this.connectionInfo = connectionInfo;
         this.logger = logger;
     }
