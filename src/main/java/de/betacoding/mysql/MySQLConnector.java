@@ -1,6 +1,5 @@
 package de.betacoding.mysql;
 
-import com.google.common.base.Preconditions;
 import de.betacoding.util.DebugLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +9,8 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class MySQLConnector implements AutoCloseable {
+    private final int timeout = 10;
+
     private final MySQLConnectionInfo connectionInfo;
     private final DebugLogger logger;
 
@@ -49,8 +50,6 @@ public class MySQLConnector implements AutoCloseable {
     }
 
     public void establish(@NotNull final String password) {
-        Preconditions.checkNotNull(password, "Password cannot be null");
-
         if (this.isEstablished()) {
             this.logger.warning("Failed to establish connection: Connection is already established");
             return;
@@ -59,12 +58,19 @@ public class MySQLConnector implements AutoCloseable {
         final String address = this.connectionInfo.getHost() + ":" + this.connectionInfo.getPort();
 
         this.logger.info("Establishing connection to '" + address + "'");
+
+        DriverManager.setLoginTimeout(this.timeout);
         long millis = System.currentTimeMillis();
+
         try {
             this.connection = DriverManager.getConnection(this.connectionInfo.getConnectionURL(), this.connectionInfo.getUser(), password);
             this.service = new MySQLQueryService(this.connection);
         } catch (SQLException exception) {
             this.connection = null;
+            if (exception.getSQLState().equals("08S01")) {
+                this.logger.severe("Failed to establish connection to '" + address + "': timed out after " + this.timeout + " seconds", exception);
+                return;
+            }
             this.logger.severe("Failed to establish connection to '" + address + "'", exception);
             return;
         }
