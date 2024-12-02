@@ -44,7 +44,7 @@ public class MySQLConnectionInfo {
 
     public <T> T getProperty(@NotNull MySQLConnectionProperty<T> property) {
         var object = this.properties.get(property);
-        return object == null ? property.getDefaultValue() : property.getType().cast(object);
+        return object == null ? null : property.getType().cast(object);
     }
 
     @NotNull

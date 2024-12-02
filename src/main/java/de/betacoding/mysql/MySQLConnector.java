@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class MySQLConnector implements AutoCloseable {
-    private final int timeout = 10;
-
     private final MySQLConnectionInfo connectionInfo;
     private final DebugLogger logger;
 
@@ -59,7 +57,6 @@ public class MySQLConnector implements AutoCloseable {
 
         this.logger.info("Establishing connection to '" + address + "'");
 
-        DriverManager.setLoginTimeout(this.timeout);
         long millis = System.currentTimeMillis();
 
         try {
@@ -68,7 +65,7 @@ public class MySQLConnector implements AutoCloseable {
         } catch (SQLException exception) {
             this.connection = null;
             if (exception.getSQLState().equals("08S01")) {
-                this.logger.severe("Failed to establish connection to '" + address + "': timed out after " + this.timeout + " seconds", exception);
+                this.logger.severe("Failed to establish connection to '" + address + "': timed out", exception);
                 return;
             }
             this.logger.severe("Failed to establish connection to '" + address + "'", exception);
